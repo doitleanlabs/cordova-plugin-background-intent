@@ -8,6 +8,7 @@
     <variable name="TARGETPACKAGES" />
     <variable name="CUSTOM_PERMISSION" />
     <preference name="TARGETPACKAGES"/>
+    <preference name="CUSTOM_PERMISSION"/>
 
     <!-- android -->
     <platform name="android">
@@ -16,6 +17,7 @@
 
         <config-file target="config.xml" parent="/*">
             <preference name="TARGETPACKAGES" value="$TARGETPACKAGES"/>
+            <preference name="CUSTOM_PERMISSION" value="$CUSTOM_PERMISSION"/>
         </config-file>
 
         <config-file target="res/xml/config.xml" parent="/*">
@@ -38,13 +40,14 @@
             <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
         </config-file>
         
-        
+        <!-- 
 	    <config-file target="AndroidManifest.xml" parent="/*">
 	        <permission android:name="$CUSTOM_PERMISSION" android:protectionLevel="normal" />
         </config-file>
         <config-file target="AndroidManifest.xml" parent="/*">
             <uses-permission android:name="$CUSTOM_PERMISSION" />
         </config-file>
+        -->
 	    <config-file target="AndroidManifest.xml" parent="/*">
             <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
         </config-file>
