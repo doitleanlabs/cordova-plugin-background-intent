@@ -67,7 +67,7 @@ public class MyBackgroundService extends Service {
                             String targetPackage = intent.getStringExtra("targetPackage");
                             if (targetPackage == null || targetPackage.isEmpty()) {
                                 Log.e(TAG, "❌ Missing targetPackage extra — cannot grant permission");
-                                sendError("Missing targetPackage", "fileFound", false);
+                                sendError("outsystems.dohle.FILO.RETURN_DB_FILE","Missing targetPackage", "fileFound", false);
                                 stopSelf();
                                 return START_NOT_STICKY;
                             }
@@ -84,55 +84,70 @@ public class MyBackgroundService extends Service {
                             sendBroadcast(resultIntent);
                             Log.d(TAG, "Generated file URI: " + uri.toString());
                         } else {
-                            sendError("No matching file found for identifier " + storeId, "fileFound", false);
+                            sendError("outsystems.dohle.FILO.RETURN_DB_FILE","No matching file found for identifier " + storeId, "fileFound", false);
                         }
                     }
                 } else {
-                    sendError("Base folder does not exist: " + baseDir.getAbsolutePath(), "fileFound", false);
+                    sendError("outsystems.dohle.FILO.RETURN_DB_FILE","Base folder does not exist: " + baseDir.getAbsolutePath(), "fileFound", false);
                 }
 
-                /* 
-                File file = new File(getExternalFilesDir(null), "products/db/teste_100_produtos.db");
+                
+            }else if (intent != null && "outsystems.dohle.FILO.GET_JSON_FILE".equals(intent.getAction())) {
+                String storeId = intent.getStringExtra("storeId");
+                File baseDir = new File(getExternalFilesDir(null), "db");
 
-                if (file.exists()) {
-                    Uri uri = FileProvider.getUriForFile(
-                        this,
-                        getPackageName() + ".darryncampbell.cordova.plugin.intent.fileprovider",
-                        file
-                    );
-                    
-                    Log.d(TAG, "Generated file URI: " + uri.toString());
-                    
-                    String targetPackage = intent.getStringExtra("targetPackage");
-                    if (targetPackage == null || targetPackage.isEmpty()) {
-                        Log.e(TAG, "❌ Missing targetPackage extra — cannot grant permission");
-                        sendError("Missing targetPackage", "fileFound", false);
-                        stopSelf();
-                        return START_NOT_STICKY;
+                if (baseDir.exists() && baseDir.isDirectory()) {
+                    File[] files = baseDir.listFiles((dir, name) -> name.endsWith(".json"));
+                    if (files != null) {
+                        File latestFile = null;
+                        int maxVersion = -1;
+
+                        for (File f : files) {
+                            String name = f.getName();
+                            if (name.matches("^" + storeId + "-Users\\.json$")) {   
+                                latestFile = f;
+                            }
+                        }
+
+                        if (latestFile != null) {
+                            Uri uri = FileProvider.getUriForFile(
+                                this,
+                                getPackageName() + ".darryncampbell.cordova.plugin.intent.fileprovider",
+                                latestFile
+                            );
+
+                            String targetPackage = intent.getStringExtra("targetPackage");
+                            if (targetPackage == null || targetPackage.isEmpty()) {
+                                Log.e(TAG, "❌ Missing targetPackage extra — cannot grant permission");
+                                sendError("outsystems.dohle.FILO.RETURN_JSON_FILE","Missing targetPackage", "fileFound", false);
+                                stopSelf();
+                                return START_NOT_STICKY;
+                            }
+
+                            grantUriPermission(targetPackage, uri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                            Log.d(TAG, "Granted permission for appB");
+
+                            Intent resultIntent = new Intent("outsystems.dohle.FILO.RETURN_JSON_FILE");
+                            resultIntent.putExtra("fileFound", true);
+                            resultIntent.putExtra("filename", latestFile.getName());
+                            resultIntent.putExtra("fileUri", uri);
+                            resultIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                            sendBroadcast(resultIntent);
+                            Log.d(TAG, "Generated file URI: " + uri.toString());
+                        } else {
+                            sendError("outsystems.dohle.FILO.RETURN_JSON_FILE","No matching file found for identifier " + storeId, "fileFound", false);
+                        }
                     }
-
-                    // Explicitly grant URI permission
-                    grantUriPermission(targetPackage, uri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                    Log.d(TAG, "Granted permission for appB");
-
-                    Intent resultIntent = new Intent("outsystems.dohle.FILO.RETURN_DB_FILE");
-                    resultIntent.putExtra("fileFound", true);
-                    resultIntent.putExtra("filename", file.getName());
-                    resultIntent.putExtra("fileUri", uri);
-                    resultIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION); // necessary for AppB to access
-                    sendBroadcast(resultIntent);
                 } else {
-                    Log.e(TAG, "File does not exist: " + file.getAbsolutePath());
-                    sendError("File not found at: " + file.getAbsolutePath(), "fileFound", false);
+                    sendError("outsystems.dohle.FILO.RETURN_DB_FILE","Base folder does not exist: " + baseDir.getAbsolutePath(), "fileFound", false);
                 }
-                    */
-            } else {
+            }  else {
                 Log.w(TAG, "Received unknown or no action. Ignoring.");
             }
 
         } catch (Exception e) {
             Log.e(TAG, "Failed to read file", e);
-            sendError("Error getting database file: " + e.getMessage());
+            sendError("outsystems.dohle.FILO.RETURN_DB_FILE","Error getting database file: " + e.getMessage());
         } finally {
             stopSelf();
         }
@@ -170,8 +185,8 @@ public class MyBackgroundService extends Service {
             .build();
     }
 
-    private void sendError(String message, Object... extras) {
-        Intent errorIntent = new Intent("outsystems.dohle.FILO.RETURN_DB_FILE");
+    private void sendError(String intentName,String message, Object... extras) {
+        Intent errorIntent = new Intent(intentName);
         errorIntent.putExtra("error", message);
 
         // Add optional extras (expects key-value pairs)
