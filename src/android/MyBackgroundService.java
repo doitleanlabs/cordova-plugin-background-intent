@@ -93,7 +93,6 @@ public class MyBackgroundService extends Service {
 
                 
             }else if (intent != null && "outsystems.dohle.FILO.GET_JSON_FILE".equals(intent.getAction())) {
-                String storeId = intent.getStringExtra("storeId");
                 File baseDir = new File(getExternalFilesDir(null), "db");
 
                 if (baseDir.exists() && baseDir.isDirectory()) {
@@ -104,7 +103,7 @@ public class MyBackgroundService extends Service {
 
                         for (File f : files) {
                             String name = f.getName();
-                            if (name.matches("^" + storeId + "-Users\\.json$")) {   
+                            if (name.matches("^[0-9]{4}-Users\\.json$")) {   
                                 latestFile = f;
                             }
                         }
