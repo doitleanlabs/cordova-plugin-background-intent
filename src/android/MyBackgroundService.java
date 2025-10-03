@@ -103,7 +103,7 @@ public class MyBackgroundService extends Service {
 
                         for (File f : files) {
                             String name = f.getName();
-                            if (name.matches("^(\d+)-Users\\.json$")) {   
+                            if (name.matches("^(\\d+)-Users\\.json$")) {   
                                 latestFile = f;
                             }
                         }
