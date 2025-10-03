@@ -134,7 +134,7 @@ public class MyBackgroundService extends Service {
                             sendBroadcast(resultIntent);
                             Log.d(TAG, "Generated file URI: " + uri.toString());
                         } else {
-                            sendError("outsystems.dohle.FILO.RETURN_JSON_FILE","No matching file found for identifier " + storeId, "fileFound", false);
+                            sendError("outsystems.dohle.FILO.RETURN_JSON_FILE","No matching file found", false);
                         }
                     }
                 } else {
